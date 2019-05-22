@@ -7,7 +7,7 @@
 //
 
 import JGProgressHUD
-import MessageInputBar
+// import MessageInputBar
 import MessageKit
 import QuickTableViewController
 import UIKit

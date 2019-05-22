@@ -11,10 +11,10 @@ import Foundation
 import MessageKit
 
 struct Message: MessageType {
-  var messageId: String
-  var sender: Sender
-  var sentDate: Date
-  var kind: MessageKind
+	var messageId: String
+	var sender: SenderType 
+	var sentDate: Date
+	var kind: MessageKind
 
   init(kind: MessageKind, sender: Sender, messageId: String, date: Date) {
     self.kind = kind
