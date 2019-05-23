@@ -317,7 +317,7 @@ class ChatViewController: MessagesViewController {
 
 	private func configureInputBarItems() {
 
-		messageInputBar.setLeftStackViewWidthConstant(to: 45, animated: false)
+		messageInputBar.setLeftStackViewWidthConstant(to: 30, animated: false)
 		messageInputBar.setRightStackViewWidthConstant(to: 30, animated: false)
 
 
@@ -326,22 +326,27 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.sendButton.title = nil
 		messageInputBar.sendButton.tintColor = UIColor(white: 1, alpha: 1)
 		messageInputBar.sendButton.layer.cornerRadius = 15
-		messageInputBar.middleContentViewPadding = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)	// this adds a padding between textinputfield and send button
+		messageInputBar.middleContentViewPadding = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 10)	// this adds a padding between textinputfield and send button
 		messageInputBar.sendButton.contentEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
 		messageInputBar.sendButton.setSize(CGSize(width: 30, height: 30), animated: false)
-		/*
-		messageInputBar.sendButton.tintColor = DCColors.primary
-
-		messageInputBar.sendButton.tintColor = UIColor(white: 1, alpha: 1)
-		messageInputBar.sendButton.backgroundColor = UIColor(white: 0.9, alpha: 1)
-		messageInputBar.sendButton.setSize(CGSize(width: 30, height: 30), animated: false)
-
-		messageInputBar.sendButton.title = nil
-		messageInputBar.sendButton.layer.cornerRadius = 15
-		*/
 
 
 		let leftItems = [
+			InputBarButtonItem()
+				.configure {
+					$0.spacing = .fixed(0)
+					let clipperIcon = #imageLiteral(resourceName: "ic_attach_file_36pt").withRenderingMode(.alwaysTemplate)
+					$0.image = clipperIcon
+					$0.tintColor = UIColor(white: 0.8, alpha: 1)
+					$0.setSize(CGSize(width: 30, height: 30), animated: false)
+				}.onSelected {
+					$0.tintColor = DCColors.primary
+					}.onDeselected {
+						$0.tintColor = UIColor(white: 0.8, alpha: 1)
+					}.onTouchUpInside { _ in
+						self.clipperButtonPressed()
+			}
+			/*
 			InputBarButtonItem()
 				.configure {
 					$0.spacing = .fixed(0)
@@ -355,6 +360,7 @@ class ChatViewController: MessagesViewController {
 				}.onTouchUpInside { _ in
 					self.didPressPhotoButton()
 			},
+		*/
 		]
 
 		messageInputBar.setStackViewItems(leftItems, forStack: .left, animated: false)
@@ -771,7 +777,11 @@ extension ChatViewController: MessagesLayoutDelegate {
 		return CGSize(width: messagesCollectionView.bounds.width, height: 20)
 	}
 
-	@objc func didPressPhotoButton() {
+	@objc private func clipperButtonPressed() {
+		showClipperOptions()
+	}
+
+	private func photoButtonPressed() {
 		if UIImagePickerController.isSourceTypeAvailable(.camera) {
 			let cameraViewController = CameraViewController { [weak self] image, _ in
 				self?.dismiss(animated: true, completion: nil)
@@ -785,7 +795,6 @@ extension ChatViewController: MessagesLayoutDelegate {
 						dc_msg_set_file(msg, path, "image/jpeg")
 						dc_msg_set_dimension(msg, width, height)
 						dc_send_msg(mailboxPointer, UInt32(self!.chatId), msg)
-
 						// cleanup
 						dc_msg_unref(msg)
 					}
@@ -800,6 +809,19 @@ extension ChatViewController: MessagesLayoutDelegate {
 			}))
 			present(alert, animated: true, completion: nil)
 		}
+	}
+
+	private func showClipperOptions() {
+		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+		let photoAction = PhotoPickerAlertAction(title: "Photo", style: .default, handler: photoActionPressed(_:))
+		alert.addAction(photoAction)
+		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		self.present(alert, animated: true, completion: nil)
+	}
+
+	private func photoActionPressed(_ action: UIAlertAction) {
+		photoButtonPressed()
 	}
 }
 
