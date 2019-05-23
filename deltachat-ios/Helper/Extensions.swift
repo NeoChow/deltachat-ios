@@ -8,6 +8,14 @@
 
 import UIKit
 
+// usefull for dev purpose
+extension UIView {
+	func makeBorder(color: UIColor = UIColor.red) {
+		self.layer.borderColor = color.cgColor
+		self.layer.borderWidth = 2
+	}
+}
+
 extension String {
   func containsCharacters() -> Bool {
     return !trimmingCharacters(in: [" "]).isEmpty

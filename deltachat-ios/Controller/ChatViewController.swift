@@ -35,6 +35,14 @@ class ChatViewController: MessagesViewController {
 	var previewView: UIView?
 	var previewController: PreviewController?
 
+	override var inputAccessoryView: UIView? {
+		if disableWriting {
+			return nil
+		}
+		return messageInputBar
+	}
+
+
 	init(chatId: Int, title: String? = nil) {
 		self.chatId = chatId
 		super.init(nibName: nil, bundle: nil)
@@ -231,13 +239,7 @@ class ChatViewController: MessagesViewController {
 		}
 	}
 
-	override var inputAccessoryView: UIView? {
-		if disableWriting {
-			return nil
-		}
 
-		return messageInputBar
-	}
 
 	private func configureMessageMenu() {
 		var menuItems: [UIMenuItem]
@@ -294,7 +296,6 @@ class ChatViewController: MessagesViewController {
 	private func configureMessageInputBar() {
 		messageInputBar.delegate = self
 		messageInputBar.inputTextView.tintColor = DCColors.primary
-		messageInputBar.sendButton.tintColor = DCColors.primary
 
 		messageInputBar.isTranslucent = true
 		messageInputBar.separatorLine.isHidden = true
@@ -315,20 +316,30 @@ class ChatViewController: MessagesViewController {
 	}
 
 	private func configureInputBarItems() {
-		messageInputBar.setLeftStackViewWidthConstant(to: 44, animated: false)
+
+		messageInputBar.setLeftStackViewWidthConstant(to: 45, animated: false)
 		messageInputBar.setRightStackViewWidthConstant(to: 30, animated: false)
+
 
 		let sendButtonImage = UIImage(named: "paper_plane")?.withRenderingMode(.alwaysTemplate)
 		messageInputBar.sendButton.image = sendButtonImage
+		messageInputBar.sendButton.title = nil
+		messageInputBar.sendButton.tintColor = UIColor(white: 1, alpha: 1)
+		messageInputBar.sendButton.layer.cornerRadius = 15
+		messageInputBar.middleContentViewPadding = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)	// this adds a padding between textinputfield and send button
+		messageInputBar.sendButton.contentEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+		messageInputBar.sendButton.setSize(CGSize(width: 30, height: 30), animated: false)
+		/*
+		messageInputBar.sendButton.tintColor = DCColors.primary
+
 		messageInputBar.sendButton.tintColor = UIColor(white: 1, alpha: 1)
 		messageInputBar.sendButton.backgroundColor = UIColor(white: 0.9, alpha: 1)
-		messageInputBar.sendButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 0, bottom: 6, right: 0)
 		messageInputBar.sendButton.setSize(CGSize(width: 30, height: 30), animated: false)
 
 		messageInputBar.sendButton.title = nil
 		messageInputBar.sendButton.layer.cornerRadius = 15
+		*/
 
-		messageInputBar.textViewPadding.right = -40
 
 		let leftItems = [
 			InputBarButtonItem()
@@ -345,6 +356,7 @@ class ChatViewController: MessagesViewController {
 					self.didPressPhotoButton()
 			},
 		]
+
 		messageInputBar.setStackViewItems(leftItems, forStack: .left, animated: false)
 
 		// This just adds some more flare
@@ -360,6 +372,12 @@ class ChatViewController: MessagesViewController {
 		}
 	}
 
+	/*
+	let rightItems = [
+	let sendButtonImage = UIImage(named: "paper_plane")?.withRenderingMode(.alwaysTemplate)
+
+	]
+	*/
 	@objc private func chatProfilePressed() {
 		coordinator?.showChatDetail(chatId: chatId)
 	}
