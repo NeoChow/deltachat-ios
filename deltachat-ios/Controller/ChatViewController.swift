@@ -16,7 +16,14 @@ import InputBarAccessoryView
 class ChatViewController: MessagesViewController {
 	weak var coordinator: ChatViewCoordinator?
 
-	let outgoingAvatarOverlap: CGFloat = 17.5
+	var isGroupChat: Bool {
+		let chat = MRChat(id: chatId)
+		return chat.chatType == .GROUP || chat.chatType == .VERYFIEDGROUP
+	}
+
+	var outgoingAvatarOverlap: CGFloat {
+		return isGroupChat ? 17.5 : 0
+	}
 	let loadCount = 30
 
 	let chatId: Int
@@ -42,13 +49,14 @@ class ChatViewController: MessagesViewController {
 		return messageInputBar
 	}
 
-
 	init(chatId: Int, title: String? = nil) {
 		self.chatId = chatId
+
 		super.init(nibName: nil, bundle: nil)
 		if let title = title {
 			updateTitleView(title: title, subtitle: nil)
 		}
+
 		hidesBottomBarWhenPushed = true
 	}
 
@@ -278,10 +286,15 @@ class ChatViewController: MessagesViewController {
 		layout?.setMessageOutgoingMessageTopLabelAlignment(LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)))
 		layout?.setMessageOutgoingMessageBottomLabelAlignment(LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)))
 
-		// Set outgoing avatar to overlap with the message bubble
+		if isGroupChat {
+			// Set outgoing avatar to overlap with the message bubble
+			layout?.setMessageIncomingAvatarSize(CGSize(width: 30, height: 30))
+		} else {
+			layout?.setMessageIncomingAvatarSize(.zero)	// hide avatars in single chats
+		}
+
+		layout?.setMessageIncomingMessagePadding(UIEdgeInsets(top: -outgoingAvatarOverlap, left: -outgoingAvatarOverlap, bottom: outgoingAvatarOverlap / 2, right: 18))
 		layout?.setMessageIncomingMessageTopLabelAlignment(LabelAlignment(textAlignment: .left, textInsets: UIEdgeInsets(top: 0, left: 18, bottom: outgoingAvatarOverlap, right: 0)))
-		layout?.setMessageIncomingAvatarSize(CGSize(width: 30, height: 30))
-		layout?.setMessageIncomingMessagePadding(UIEdgeInsets(top: -outgoingAvatarOverlap, left: -18, bottom: outgoingAvatarOverlap / 2, right: 18))
 		layout?.setMessageIncomingMessageBottomLabelAlignment(LabelAlignment(textAlignment: .left, textInsets: UIEdgeInsets(top: -7, left: 38, bottom: 0, right: 0)))
 
 		layout?.setMessageIncomingAccessoryViewSize(CGSize(width: 30, height: 30))
